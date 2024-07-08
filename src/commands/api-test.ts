@@ -13,7 +13,7 @@ export const registerApiTest = (context: vscode.ExtensionContext) => {
     const workspace = states.pull("activeProject") as vscode.WorkspaceFolder;
     const workspaceStates = getWorkspaceStates(workspace);
     if (!workspace || !workspaceStates) return;
-    const milkioWatcher = vscode.window.terminals.find((terminal) => terminal.name === (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1 ? `(${workspace.name}) Milkio Run & Watch` : `Milkio Run & Watch`))
+    const milkioWatcher = vscode.window.terminals.find((terminal) => terminal.name === (states.pull("mode") === "multiple" ? `(${workspace.name}) Milkio Run & Watch` : `Milkio Run & Watch`))
     if (!milkioWatcher) { await vscode.commands.executeCommand("milkio.run-and-watch"); }
     await new Promise((resolve) => setTimeout(resolve, 500));
     await workspaceStates.pull("generatingPromise");
@@ -23,7 +23,7 @@ export const registerApiTest = (context: vscode.ExtensionContext) => {
 
     const filePath = docment.uri.fsPath.slice(workspace.uri.fsPath.length + "/src/app/".length).slice(0, -3);
     const terminalName =
-      vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1
+      states.pull("mode") === "multiple"
         ? `(${workspace.name}) Milkio API Test`
         : `Milkio API Test`;
 

@@ -12,6 +12,8 @@ export const states = definePurinPubsub<{
   activeProject: null | vscode.WorkspaceFolder;
   // The user may not have set the environment variable, but actually installed bun (in the default~/. bun/bin/bun). If this value is true, it indicates that the user is in this situation. In this case, when calling bun, an absolute path is used
   absoluteBun: boolean;
+  // The number of projects in the current workspace that belong to Milkio. If there are multiple, also display the name of the workspace where Milkio is located.
+  mode: 'single' | 'multiple'
 }>();
 
 states.publish("output", vscode.window.createOutputChannel("Milkio"));

@@ -41,7 +41,7 @@ export const registerExtensionMenu = (context: vscode.ExtensionContext) => {
       if (selected.label === "Run Milkio & Watch") {
         vscode.commands.executeCommand("milkio.run-and-watch");
       } else if (selected.label === "Generate") {
-        if (vscode.window.terminals.find((terminal) => terminal.name === (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1 ? `(${workspace.name}) Milkio Run & Watch` : `Milkio Run & Watch`))) {
+        if (vscode.window.terminals.find((terminal) => terminal.name === (states.pull("mode") === "multiple" ? `(${workspace.name}) Milkio Run & Watch` : `Milkio Run & Watch`))) {
           vscode.window.showErrorMessage(
             "Milkio Run & Watch is in the open, generate will cause it to throw an exception. Please close and try again."
           );
@@ -53,7 +53,7 @@ export const registerExtensionMenu = (context: vscode.ExtensionContext) => {
       }
     } else {
       const terminalName =
-        vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1
+        states.pull("mode") === "multiple"
           ? `(${workspace.name}) ${selected.label}`
           : `${selected.label}`;
 
@@ -102,6 +102,9 @@ export type MilkioConfig = {
     significant?: Array<string>;
     insignificant?: Array<string>;
   },
+  link?: {
+    projects?: Array<{ name?: string, cwd?: string, script?: Record<string, string> }>;
+  }
   menubar?: {
     commands?: Array<{ name?: string, script?: string, icon?: string, env?: Record<string, string> }>;
   }

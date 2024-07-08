@@ -5,6 +5,10 @@ import { debounce } from "lodash";
 import { join } from "path";
 import { readFile } from "fs/promises";
 import { getEnv } from "../utils/get-env";
+import { existsSync } from "node:fs";
+import { load } from "js-toml";
+import { MilkioConfig } from "./extension-menu";
+import { homedir } from "node:os";
 
 export const registerRunAndWatch = (context: vscode.ExtensionContext) => {
   const disposable = vscode.commands.registerCommand("milkio.run-and-watch", () => {
@@ -17,7 +21,7 @@ export const registerRunAndWatch = (context: vscode.ExtensionContext) => {
     if (!workspace || !workspaceStates) return;
     workspaceStates.publish("commandRunAndWatchReloading", true);
     const terminalName =
-      vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1
+      states.pull("mode") === "multiple"
         ? `(${workspace.name}) Milkio Run & Watch`
         : `Milkio Run & Watch`;
     workspaceStates.publish("commandRunAndWatchTerminalName", terminalName);
@@ -67,6 +71,35 @@ export const registerRunAndWatch = (context: vscode.ExtensionContext) => {
 
       // Sometimes, a file creation occurs within VS Code, but Bun fails to locate it. By introducing a suitable delay, the issue can be mitigated.
       setTimeout(() => terminal.sendText(command), 1440);
+
+      if (existsSync(join(workspace.uri.fsPath, "milkio.toml"))) {
+        const milkioConfig = load(await readFile(join(workspace.uri.fsPath, "milkio.toml"), "utf-8")) as MilkioConfig;
+        if (milkioConfig?.link?.projects) {
+          for (const project of milkioConfig.link.projects) {
+            if (!project.name || !project.script) continue;
+            let projectCwd = "";
+            if (!project.cwd) projectCwd = workspace.uri.fsPath;
+            else if (project.cwd.startsWith("~/")) projectCwd = join(homedir(), project.cwd.slice(2));
+            else if (project.cwd.startsWith("./") || project.cwd.startsWith("../")) projectCwd = join(workspace.uri.fsPath, project.cwd);
+            else projectCwd = project.cwd;
+            const terminalName =
+              states.pull("mode") === "multiple"
+                ? `(${workspace.name}) ${project.name}`
+                : `${project.name}`;
+            const oldTerminal = vscode.window.terminals.find((terminal) => terminal.name === terminalName);
+            if (!oldTerminal) {
+              const terminal = vscode.window.createTerminal({
+                name: terminalName,
+                cwd: projectCwd,
+                iconPath: new vscode.ThemeIcon("symbol-method"),
+                isTransient: true,
+                env: { ...getEnv() },
+              });
+              terminal.sendText(`${project.script}`);
+            }
+          }
+        }
+      }
     }, 256);
 
     const unsubscribe1 = workspaceStates.subscribe("generating", async (e) => {
