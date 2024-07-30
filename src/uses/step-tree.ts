@@ -58,6 +58,9 @@ const onStepTreeDocment = async (element?: SchemaItem): Promise<Array<SchemaItem
         let metaSelected = false;
         let actionSelected = false;
         let testsSelected = false;
+        let vueTemplateSelected = false;
+        let vueScriptSelected = false;
+        let vueStyleSelected = false;
 
         while (currentline < maxline - 1) {
             currentline = currentline + 1;
@@ -75,6 +78,18 @@ const onStepTreeDocment = async (element?: SchemaItem): Promise<Array<SchemaItem
                 if (testsSelected) continue;
                 title = "Tests";
                 testsSelected = true;
+            } else if (document.languageId === "vue" && text.startsWith("<template")) {
+                if (vueTemplateSelected) continue;
+                title = "Template";
+                vueTemplateSelected = true;
+            } else if (document.languageId === "vue" && text.startsWith("<script")) {
+                if (vueScriptSelected) continue;
+                title = "Script";
+                vueScriptSelected = true;
+            } else if (document.languageId === "vue" && text.startsWith("<style")) {
+                if (vueStyleSelected) continue;
+                title = "Style";
+                vueStyleSelected = true;
             } else {
                 continue;
             }
@@ -98,10 +113,10 @@ const onStepTreeDocment = async (element?: SchemaItem): Promise<Array<SchemaItem
             );
         }
 
-        if (items.length === 1) {
+        if (items.length === 0) {
             items.push(
                 new SchemaItem({
-                    title: `No groups`,
+                    title: editor.document.languageId,
                     document: document,
                     model: false,
                     startline: 0,
@@ -127,9 +142,9 @@ const onStepTreeDocment = async (element?: SchemaItem): Promise<Array<SchemaItem
             const lang = document.languageId;
             let title: string = "";
 
-            if (text.includes(".step(") || text.includes("createStep(")) {
+            if (text.includes(".step(")) {
                 let tmpLine = currentline - 1;
-                if (element.label === "Action" && content[tmpLine].trim().startsWith("*/")) {
+                if (content[tmpLine].trim().startsWith("*/")) {
                     while (true) {
                         tmpLine = tmpLine - 1;
                         if (content[tmpLine].trim().startsWith("*")) {
