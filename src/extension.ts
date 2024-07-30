@@ -9,6 +9,7 @@ import { registerOutputChannel } from "./commands/output-channel";
 import { registerRunAndWatch } from "./commands/run-and-watch";
 import { checkBunInstalled } from "./utils/check-bun-installed";
 import { createFromTemplate } from "./commands/create-from-template";
+import { useStepTree } from "./uses/step-tree";
 
 export async function activate(context: vscode.ExtensionContext) {
   await useProjectWatcher(context);
@@ -28,6 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
     useApiTest(context),
     useAutoGenerate(context),
     useStatusBar(context),
+    useStepTree(context),
   ]);
 }
 
