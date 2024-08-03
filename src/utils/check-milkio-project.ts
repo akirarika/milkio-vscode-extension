@@ -21,7 +21,6 @@ export const checkMilkioProject = async (fspath: string): Promise<boolean> => {
   const output = states.pull("output") as vscode.OutputChannel;
 
   if (!(existsSync(join(fspath, "milkio.toml")))) {
-    vscode.window.showErrorMessage(`The file "milkio.toml" does not exist, and it is required.`);
     return false;
   }
 
