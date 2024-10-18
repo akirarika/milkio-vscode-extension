@@ -1,0 +1,10 @@
+["general"]
+includes = ["co:npm", "co:git"]
+
+
+["publish:generator"]
+commands = ["publish:client", "p:g"]
+scripts = ['''
+    cd ./packages/milkio-generator
+    && bun build ./index.ts --compile --outfile "../../app" --target bun
+''']
