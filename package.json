@@ -6,7 +6,7 @@
   "publisher": "akirarika",
   "icon": "icon.png",
   "repository": "https://github.com/southern-aurora/milkio",
-  "version": "1.2.4",
+  "version": "1.2.6",
   "scripts": {
     "package": "rm -rf ./dist && bun run esbuild-base -- --minify && vsce package",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
@@ -147,6 +147,7 @@
     "jiti": "^1.21.0",
     "js-toml": "^1.0.0",
     "lodash": "^4.17.21",
+    "typia": "^6.11.3",
     "vsce": "^2.15.0"
   }
 }

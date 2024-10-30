@@ -73,33 +73,33 @@ const onStepTreeDocment = async (
     while (currentline < maxline - 1) {
       currentline = currentline + 1;
       const text = content[currentline];
-      let title: string = "";
-      if (text.includes("meta:")) {
-        if (metaSelected) continue;
-        title = "Meta";
-        metaSelected = true;
-      } else if (text.includes("action(")) {
+      let title = "";
+      if (text.includes("export default action(")) {
         if (actionSelected) continue;
-        title = "Action";
+        title = "action";
         actionSelected = true;
-      } else if (text.includes("defineApiTest(")) {
+      } else if (text.includes("export default stream(")) {
+        if (actionSelected) continue;
+        title = "stream";
+        actionSelected = true;
+      } else if (text.startsWith("test(") || text.startsWith("test.sequential(")) {
         if (testsSelected) continue;
-        title = "Tests";
+        title = "tests";
         testsSelected = true;
       } else if (
         document.languageId === "vue" &&
         text.startsWith("<template")
       ) {
         if (vueTemplateSelected) continue;
-        title = "Template";
+        title = "template";
         vueTemplateSelected = true;
       } else if (document.languageId === "vue" && text.startsWith("<script")) {
         if (vueScriptSelected) continue;
-        title = "Script";
+        title = "script";
         vueScriptSelected = true;
       } else if (document.languageId === "vue" && text.startsWith("<style")) {
         if (vueStyleSelected) continue;
-        title = "Style";
+        title = "style";
         vueStyleSelected = true;
       } else {
         continue;
@@ -153,40 +153,9 @@ const onStepTreeDocment = async (
       const lang = document.languageId;
       let title: string = "";
 
-      if (text.includes(".step(")) {
-        let tmpLine = currentline - 1;
-        if (content[tmpLine].trim().startsWith("*/")) {
-          while (true) {
-            tmpLine = tmpLine - 1;
-            if (content[tmpLine].trim().startsWith("*")) {
-              title = `step: ${content[tmpLine]
-                .trim()
-                .replace(/^\*+/, "")
-                .trim()}`;
-              startline = tmpLine;
-            } else break;
-          }
-        } else {
-          title = "step";
-        }
-      } else if (
-        element.label === "Tests" &&
-        (text.trim().startsWith("handler:") ||
-          text.trim().startsWith("handler(") ||
-          text.trim().startsWith("async handler("))
-      ) {
-        let tmpLine = currentline - 1;
-        if (!content[tmpLine].trim().startsWith("name:")) {
-          continue;
-        }
-        title = `test: `;
-        const strArr = content[tmpLine].trim().match(/(['"`]).*?\1/g);
-        if (strArr) {
-          for (const str of strArr) {
-            title = title + str.substring(1, str.length - 1);
-          }
-        }
-      } else {
+      if (text.trimStart().startsWith("* @step")) {
+        title = `step: ${text.trimStart().split("* @step")[1].trim()}`;
+      }else {
         continue;
       }
 

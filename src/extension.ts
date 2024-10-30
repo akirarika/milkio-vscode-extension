@@ -11,13 +11,13 @@ import { createFromTemplateCommand } from "./command/create-from-template.comman
 import { useStepTree } from "./step/step-tree";
 
 export async function activate(context: vscode.ExtensionContext) {
+  useStepTree(context);
+
   if (vscode.workspace.workspaceFolders?.length !== 1) return;
   const workspace = vscode.workspace.workspaceFolders[0];
   if (!existsSync(join(workspace.uri.fsPath, "cookbook.toml"))) return;
 
-  const cookbookTomlRaw = (
-    await readFile(join(workspace.uri.fsPath, "cookbook.toml"))
-  ).toString();
+  const cookbookTomlRaw = (await readFile(join(workspace.uri.fsPath, "cookbook.toml"))).toString();
   const cookbookToml = load(cookbookTomlRaw) as CookbookOptions;
   if (!cookbookToml.general.start) {
     vscode.window.showInformationMessage("Cookbook: Start script detected.");
@@ -28,12 +28,10 @@ export async function activate(context: vscode.ExtensionContext) {
   states.value.cookbookToml = markRaw(cookbookToml);
   states.value.extensionEnable = true;
 
-  await bootstrap();
-
-  await Promise.all([
+  void bootstrap();
+  void Promise.all([
     //
     createFromTemplateCommand(context),
-    useStepTree(context),
   ]);
 }
 
