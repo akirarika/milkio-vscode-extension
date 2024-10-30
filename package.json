@@ -6,7 +6,7 @@
   "publisher": "akirarika",
   "icon": "icon.png",
   "repository": "https://github.com/southern-aurora/milkio",
-  "version": "1.2.1",
+  "version": "1.2.4",
   "scripts": {
     "package": "rm -rf ./dist && bun run esbuild-base -- --minify && vsce package",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",

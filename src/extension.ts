@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { existsSync } from "fs";
-import { join } from "path";
-import { readFile } from "fs/promises";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { readFile } from "node:fs/promises";
 import { load } from "js-toml";
-import { CookbookOptions } from "./utils/cookbook-dto-types";
+import type { CookbookOptions } from "./utils/cookbook-dto-types";
 import { states } from "./states";
 import { markRaw } from "@vue/reactivity";
 import { bootstrap } from "./bootstrap";
